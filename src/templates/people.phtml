@@ -1,0 +1,37 @@
+<html>
+<head>
+    <title>Person List</title>
+
+    <?php include_once "header.php"; ?>
+</head>
+<body>
+
+<?php include_once "navbar.php"; ?>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+
+            <h1>People</h1>
+
+            <table class="table table-bordered">
+                <tr>
+                    <td>Id</td>
+                    <td>Name</td>
+                </tr>
+                <?php foreach ($people as $person): ?>
+                    <tr>
+                        <td><a href="/person/<?= $person->getId() ?>"><?= $person->getId() ?></a></td>
+                        <td><?= $person->getName() ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<?php include_once "footer.php"; ?>
+
+</body>
+</html>

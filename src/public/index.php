@@ -36,6 +36,8 @@ $container['db'] = function ($c) {
     return $pdo;
 };
 
+$container['view'] = new \Slim\Views\PhpRenderer("../templates/");
+
 $app->get('/hello/{name}', function (Request $request, Response $response) {
     $this->logger->addInfo("Something interesting happened");
 
@@ -50,6 +52,32 @@ $app->get('/hello/{name}', function (Request $request, Response $response) {
     $response->getBody()->write("Hello, $name");
 
     return $response;
+});
+
+$app->get('/person', function (Request $request, Response $response) {
+    $this->logger->addInfo("People list");
+    $dao = new PersonDao($this->db);
+    $people = $dao->listPeople();
+
+    return $this->view->render($response, "people.phtml", ["people" => $people]);
+});
+
+$app->get('/person/{id}', function (Request $request, Response $response, $args) {
+    $id = (int)$args['id'];
+    $dao = new PersonDao($this->db);
+    $person = $dao->find($id);
+
+    return $this->view->render($response, "person.phtml", ["person" => $person]);
+});
+
+$app->post('/person/{id}', function (Request $request, Response $response, $args) {
+    $data = $request->getParsedBody();
+    $dao = new PersonDao($this->db);
+    $person = $dao->find(filter_var($data['id'], FILTER_SANITIZE_NUMBER_INT));
+    $person->setName(filter_var($data['name'], FILTER_SANITIZE_STRING));
+    $person = $dao->update($person);
+
+    return $this->view->render($response, "person.phtml", ["person" => $person, "message" => "Person saved"]);
 });
 
 $app->run();
